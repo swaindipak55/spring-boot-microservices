@@ -15,4 +15,6 @@ public class Address {
     private Integer addressId;
 
     private String address;
+
+    private String servicePort;
 }

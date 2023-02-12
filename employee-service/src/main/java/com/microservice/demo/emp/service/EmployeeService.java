@@ -8,6 +8,7 @@ import com.microservice.demo.emp.model.Address;
 import com.microservice.demo.emp.model.Department;
 import com.microservice.demo.emp.model.Employee;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,6 +19,9 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class EmployeeService {
+
+    @Value("${server.port}")
+    private String servicePort;
 
     private final EmployeeRepository employeeRepository;
     private final RestTemplate restTemplate;
@@ -50,10 +54,13 @@ public class EmployeeService {
                 .empId(employee.getEmpId())
                 .email(employee.getEmail())
                 .name(employee.getName())
+                .empServicePort(servicePort)
                 .addressId(addressId)
                 .address(Objects.requireNonNull(address).getAddress())
+                .addrServicePort(address.getServicePort())
                 .departmentId(departmentId)
                 .departName(Objects.requireNonNull(department).getDepartmentName())
+                .deptServicePort(department.getServicePort())
                 .build();
     }
 
@@ -67,10 +74,13 @@ public class EmployeeService {
                 .empId(employee.getEmpId())
                 .email(employee.getEmail())
                 .name(employee.getName())
+                .empServicePort(servicePort)
                 .addressId(addressId)
                 .address(Objects.requireNonNull(address).getAddress())
+                .addrServicePort(address.getServicePort())
                 .departmentId(departmentId)
                 .departName(Objects.requireNonNull(department).getDepartmentName())
+                .deptServicePort(department.getServicePort())
                 .build();
     }
 }

@@ -4,37 +4,5 @@ server:
 spring:
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      routes:
-        - id: address-service
-          uri: lb://address-service
-          predicates:
-            - Path=/address/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: address-service
-                fallbackuri: forward:/addressServiceFallBack
-        - id: department-service
-          uri: lb://department-service
-          predicates:
-            - Path=/department/**
-        - id: employee-service
-          uri: lb://employee-service
-          predicates:
-            - Path=/employee/**
-          filters:
-            - name: CircuitBreaker
-              args:
-                name: employee-service
-                fallbackuri: forward:/employeeServiceFallBack
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    hostname: localhost
+  config:
+    import: configserver:http://localhost:8762

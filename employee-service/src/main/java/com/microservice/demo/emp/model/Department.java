@@ -14,4 +14,6 @@ public class Department {
     private Integer departmentId;
 
     private String departmentName;
+
+    private String servicePort;
 }

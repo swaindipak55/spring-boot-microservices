@@ -17,11 +17,17 @@ public class EmployeeDto {
 
     private String email;
 
+    private String empServicePort;
+
     private Integer departmentId;
 
     private Integer addressId;
 
     private String address;
 
+    private String addrServicePort;
+
     private String departName;
+
+    private String deptServicePort;
 }
