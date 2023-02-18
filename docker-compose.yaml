@@ -1,0 +1,107 @@
+version: '3.7'
+services:
+
+  mysqldb:
+    container_name: mysqldb
+    image: mysql:8.0
+    volumes:
+      - /MySQLDB:/var/lib/mysql
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_DATABASE: microservices
+      MYSQL_ROOT_PASSWORD: Deepak@123
+
+  zipkin-server:
+    image: openzipkin/zipkin:2.23
+    ports:
+      - 9411:9411
+    networks:
+      - my_network
+    restart: always #Restart if there is a problem starting up
+
+  service-registry:
+    build: ./service-registry
+    image: swaindipak55/service-registry
+    container_name: service-registry
+    ports:
+      - 8761:8761
+    networks:
+      - my_network
+
+  config-server:
+    build: ./config-server
+    image: swaindipak55/config-server
+    container_name: config-server
+    ports:
+      - 8762:8762
+    networks:
+      - my_network
+    depends_on:
+      - service-registry
+    environment:
+      - eureka.client.serviceUrl.defaultZone=http://service-registry:8761/eureka/
+      - eureka.instance.hostname=config-server
+      - spring.cloud.config.server.git.uri=https://github.com/swaindipak55/config-server
+      - spring.datasource.url=jdbc:mysql://mysqldb:3307/microservices
+    
+  api-gateway:
+    build: ./api-gateway
+    image: swaindipak55/api-gateway
+    container_name: api-gateway
+    ports:
+      - 9090:9090
+    networks:
+      - my_network
+    depends_on:
+      - config-server
+    environment:
+      - spring.config.import=configserver:http://config-server:8762
+    
+  address-service:
+    build: ./address-service
+    image: swaindipak55/address-service
+    container_name: address-service
+    ports:
+      - 8082:8082
+    networks:
+      - my_network
+    depends_on:
+      - api-gateway
+      - config-server
+    environment:
+      - spring.zipkin.baseurl=http://zipkin-server:9411
+      - spring.config.import=configserver:http://config-server:8762
+
+  department-service:
+    build: ./department-service
+    image: swaindipak55/department-service
+    container_name: department-service
+    ports:
+      - 8081:8081
+    networks:
+      - my_network
+    depends_on:
+      - api-gateway
+      - config-server
+    environment:
+      - spring.zipkin.baseurl=http://zipkin-server:9411
+      - spring.config.import=configserver:http://config-server:8762
+
+  employee-service:
+    build: ./employee-service
+    image: swaindipak55/employee-service
+    container_name: employee-service
+    ports:
+      - 8080:8080
+    networks:
+      - my_network
+    depends_on:
+      - api-gateway
+      - config-server
+    environment:
+      - spring.zipkin.baseurl=http://zipkin-server:9411
+      - spring.config.import=configserver:http://config-server:8762
+      
+networks:
+  my_network:
